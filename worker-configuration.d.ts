@@ -3,11 +3,11 @@
 // Runtime types generated with workerd@1.20251011.0 2025-11-01 
 declare namespace Cloudflare {
 	interface GlobalProps {
-		mainModule: typeof import("./src/index");
+		mainModule: typeof import("./src/aggregate");
 		durableNamespaces: "MyDurableObject";
 	}
 	interface Env {
-		MY_DURABLE_OBJECT: DurableObjectNamespace<import("./src/index").MyDurableObject>;
+		MY_DURABLE_OBJECT: DurableObjectNamespace<import("./src/aggregate").MyDurableObject>;
 	}
 }
 interface Env extends Cloudflare.Env {}
