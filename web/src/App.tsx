@@ -3,6 +3,7 @@ import './App.css'
 
 function App() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
+  const [testResult, setTestResult] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,6 +15,20 @@ function App() {
 
   const handleUploadClick = () => {
     fileInputRef.current?.click()
+  }
+
+  const testButton = async () => {
+    try {
+      console.log('Calling Worker API...')
+      const response = await fetch('/api/test')
+      console.log(response)
+      const data = await response.json()
+      console.log('Worker response:', data)
+      setTestResult(JSON.stringify(data, null, 2))
+    } catch (error) {
+      console.error('Error calling Worker:', error)
+      setTestResult(`Error: ${String(error)}`)
+    }
   }
 
   const handleUpload = async () => {
@@ -61,6 +76,34 @@ function App() {
         >
           Select Log Files
         </button>
+
+        <button
+          onClick={testButton}
+          style={{
+            padding: '12px 24px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            backgroundColor: '#6c757d',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px'
+          }}
+        >
+          Test Worker API
+        </button>
+
+        {testResult && (
+          <div style={{
+            marginTop: '20px',
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            border: '1px solid #dee2e6',
+            borderRadius: '4px'
+          }}>
+            <h3>Worker Response:</h3>
+            <pre style={{ margin: 0, fontSize: '14px' }}>{testResult}</pre>
+          </div>
+        )}
 
         {selectedFiles && selectedFiles.length > 0 && (
           <>

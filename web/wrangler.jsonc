@@ -1,5 +1,11 @@
 {
 	"name": "wandering-brook-d1cc",
 	"compatibility_date": "2025-11-01",
-	"pages_build_output_dir": "./dist"
+	"pages_build_output_dir": "./dist",
+	"services": [
+		{
+			"binding": "WORKER_API",
+			"service": "cf-ai-cache-optimizer"
+		}
+	]
 }
