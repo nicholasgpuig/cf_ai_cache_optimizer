@@ -58,9 +58,7 @@ export default {
 
 		// Fallback: Durable Object example
 		if (path === '/') {
-			const stub = env.MY_DURABLE_OBJECT.getByName("foo");
-			const greeting = await stub.sayHello("world");
-			return new Response(greeting);
+			return new Response("Default");
 		}
 
 		// Route not found

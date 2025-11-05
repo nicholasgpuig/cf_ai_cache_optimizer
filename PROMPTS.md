@@ -10,3 +10,10 @@ How does the onRequest function work? Does it trigger on every outbound request 
 In the workers wrangler config, why do we need an entrypoint for the main parameter? In our case where each worker will be called by the pages, will it work to keep main as a random one since we'll never call the worker directly?
 
 Should we create separate worker files for each endpoint that the index.ts can route to? How would we structure that? Don't write code.
+
+Now, with this general method in place, create a log file each for 4 different scenarios, expressed through the logs, that we can test the LLM with and ensure it observes the patterns present:
+- DDos attack
+- Load balancer needs configuration
+- Lots of cache misses for specific query
+- Origin response time spiking for certain endpoint
+Either modify the original generation function or create child functions for each specific scenario.
