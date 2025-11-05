@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './App.css'
 
 function App() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
   const [testResult, setTestResult] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const navigate = useNavigate()
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -103,6 +105,8 @@ function App() {
       }
       alert(message)
 
+      // TODO: Redirect to LLM view with result as initial arg
+
       // Optionally display results
       setTestResult(JSON.stringify(result, null, 2))
 
@@ -113,8 +117,9 @@ function App() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>Log File Upload</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: 'white', padding: '20px' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        <h1>Log File Upload</h1>
 
       <div style={{ marginTop: '20px' }}>
         <input
@@ -151,10 +156,26 @@ function App() {
             backgroundColor: '#6c757d',
             color: 'white',
             border: 'none',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            marginRight: '10px'
           }}
         >
           Test Worker API
+        </button>
+
+        <button
+          onClick={() => navigate('/chat')}
+          style={{
+            padding: '12px 24px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            backgroundColor: '#17a2b8',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px'
+          }}
+        >
+          Open AI Chat
         </button>
 
         {testResult && (
@@ -200,6 +221,7 @@ function App() {
           </>
         )}
 
+      </div>
       </div>
     </div>
   )

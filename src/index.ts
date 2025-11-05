@@ -1,6 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { handleTest } from './handlers/test';
 import { handleAnalyze } from './handlers/analyze';
+import { handleChat } from './handlers/chat';
 import { errorResponse } from './utils/response';
 
 /**
@@ -35,6 +36,7 @@ export class MyDurableObject extends DurableObject {
 const routes: Record<string, (request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>> = {
 	'/api/test': handleTest,
 	'/api/analyze': handleAnalyze,
+	'/api/chat': handleChat,
 };
 
 export default {

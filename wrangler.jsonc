@@ -1,7 +1,7 @@
 {
 	"name": "cf-ai-cache-optimizer",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-11-01",
+	"compatibility_date": "2024-09-23",
 	"durable_objects": {
 		"bindings": [
 			{
@@ -19,5 +19,12 @@
 	],
 	"observability": {
 		"enabled": true
+	},
+	"$schema": "./node_modules/wrangler/config-schema.json",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+	"ai": {
+		"binding": "AI"
 	}
 }

@@ -35,17 +35,17 @@ export default function LLMChat() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput('');
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call to your LLM endpoint
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({
+          messages: updatedMessages.map(m => ({
             role: m.role,
             content: m.content
           }))
@@ -85,42 +85,51 @@ export default function LLMChat() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f9fafb' }}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-800">AI Cache Optimizer</h1>
-        <p className="text-sm text-gray-600">Chat with AI to analyze your CDN cache performance</p>
+      <div style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb', padding: '1.5rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>AI Cache Optimizer</h1>
+        <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0 0' }}>Chat with AI to analyze your CDN cache performance</p>
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9ca3af' }}>
+            <svg style={{ width: '4rem', height: '4rem', marginBottom: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <p className="text-lg">Start a conversation</p>
-            <p className="text-sm">Ask me about cache optimization, performance issues, or log analysis</p>
+            <p style={{ fontSize: '1.125rem', margin: '0.5rem 0' }}>Start a conversation</p>
+            <p style={{ fontSize: '0.875rem' }}>Ask me about cache optimization, performance issues, or log analysis</p>
           </div>
         )}
 
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            style={{
+              display: 'flex',
+              justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+              marginBottom: '1rem'
+            }}
           >
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${
-                message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-800 border border-gray-200'
-              }`}
+              style={{
+                maxWidth: '70%',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                backgroundColor: message.role === 'user' ? '#2563eb' : 'white',
+                color: message.role === 'user' ? 'white' : '#1f2937',
+                border: message.role === 'user' ? 'none' : '1px solid #e5e7eb'
+              }}
             >
-              <div className="whitespace-pre-wrap break-words">{message.content}</div>
+              <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{message.content}</div>
               <div
-                className={`text-xs mt-1 ${
-                  message.role === 'user' ? 'text-blue-200' : 'text-gray-400'
-                }`}
+                style={{
+                  fontSize: '0.75rem',
+                  marginTop: '0.25rem',
+                  color: message.role === 'user' ? '#bfdbfe' : '#9ca3af'
+                }}
               >
                 {message.timestamp.toLocaleTimeString()}
               </div>
@@ -129,12 +138,12 @@ export default function LLMChat() {
         ))}
 
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-gray-200 rounded-lg px-4 py-3">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <div style={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '0.75rem 1rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#9ca3af', borderRadius: '50%', animation: 'bounce 1s infinite', animationDelay: '0ms' }}></div>
+                <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#9ca3af', borderRadius: '50%', animation: 'bounce 1s infinite', animationDelay: '150ms' }}></div>
+                <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#9ca3af', borderRadius: '50%', animation: 'bounce 1s infinite', animationDelay: '300ms' }}></div>
               </div>
             </div>
           </div>
@@ -144,25 +153,53 @@ export default function LLMChat() {
       </div>
 
       {/* Input Container */}
-      <div className="bg-white border-t border-gray-200 px-6 py-4">
-        <div className="flex items-end space-x-3 max-w-4xl mx-auto">
+      <div style={{ backgroundColor: 'white', borderTop: '1px solid #e5e7eb', padding: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', maxWidth: '64rem', margin: '0 auto' }}>
           <textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message... (Shift+Enter for new line)"
-            className="flex-1 resize-none rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 overflow-y-auto"
+            style={{
+              flex: 1,
+              resize: 'none',
+              borderRadius: '0.5rem',
+              border: '1px solid #d1d5db',
+              padding: '0.75rem 1rem',
+              maxHeight: '8rem',
+              overflowY: 'auto',
+              outline: 'none'
+            }}
             rows={1}
             disabled={isLoading}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="bg-blue-600 text-white rounded-lg p-3 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{
+              backgroundColor: !input.trim() || isLoading ? '#93c5fd' : '#2563eb',
+              color: 'white',
+              borderRadius: '0.5rem',
+              padding: '0.75rem',
+              border: 'none',
+              cursor: !input.trim() || isLoading ? 'not-allowed' : 'pointer',
+              opacity: !input.trim() || isLoading ? 0.5 : 1,
+              transition: 'background-color 0.2s'
+            }}
+            onMouseOver={(e) => {
+              if (input.trim() && !isLoading) {
+                e.currentTarget.style.backgroundColor = '#1d4ed8';
+              }
+            }}
+            onMouseOut={(e) => {
+              if (input.trim() && !isLoading) {
+                e.currentTarget.style.backgroundColor = '#2563eb';
+              }
+            }}
           >
             <svg
-              className="w-6 h-6"
+              style={{ width: '1.5rem', height: '1.5rem' }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
