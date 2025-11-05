@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -12,6 +12,7 @@ type Message = {
 
 export default function LLMChat() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -152,15 +153,39 @@ export default function LLMChat() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#f9fafb' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', backgroundColor: 'white', overflow: 'hidden' }}>
       {/* Header */}
-      <div style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb', padding: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>AI Cache Optimizer</h1>
-        <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0 0' }}>Chat with AI to analyze your CDN cache performance</p>
+      <div style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb', padding: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', maxWidth: '1200px' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#6b7280',
+              transition: 'color 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.color = '#1f2937'}
+            onMouseOut={(e) => e.currentTarget.style.color = '#6b7280'}
+          >
+            <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
+          <div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>AI Cache Optimizer</h1>
+            <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '0.25rem 0 0 0' }}>Chat with AI to analyze your CDN cache performance</p>
+          </div>
+        </div>
       </div>
 
       {/* Messages Container */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ width: '100%', maxWidth: '1200px' }}>
         {messages.length === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9ca3af' }}>
             <svg style={{ width: '4rem', height: '4rem', marginBottom: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,11 +316,12 @@ export default function LLMChat() {
         )}
 
         <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* Input Container */}
-      <div style={{ backgroundColor: 'white', borderTop: '1px solid #e5e7eb', padding: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', maxWidth: '64rem', margin: '0 auto' }}>
+      <div style={{ backgroundColor: 'white', borderTop: '1px solid #e5e7eb', padding: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', maxWidth: '64rem', margin: '0 auto', width: '100%', padding: '0 1rem' }}>
           <textarea
             ref={textareaRef}
             value={input}

@@ -49,3 +49,8 @@ The Workers AI response for @cf/openai/gpt-oss-120b has a nested structure where
 
 
 Test the complete chat flow by navigating to /chat, sending a message, and verifying the AI response appears correctly. Check that conversation context is maintained across multiple messages. Fix any React state management issues by using local variables for updated message arrays before async operations to avoid stale closures. Ensure all styling uses inline styles since Tailwind is not configured.
+
+
+Make two UI changes:
+First, include a back arrow in the chat ui to take you back to the file upload screen, restarting the process.
+Second, for both the chat and upload views, make the white cover the entire screen space no matter the size of the other elements; right now the white section only covers about the size of a phone.

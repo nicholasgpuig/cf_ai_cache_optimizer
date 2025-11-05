@@ -4,9 +4,9 @@ import './App.css'
 
 function App() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
-  const [testResult, setTestResult] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
+  //const [testResult, setTestResult] = useState<string>('')
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -19,19 +19,19 @@ function App() {
     fileInputRef.current?.click()
   }
 
-  const testButton = async () => {
-    try {
-      console.log('Calling Worker API...')
-      const response = await fetch('/api/test')
-      console.log(response)
-      const data = await response.json()
-      console.log('Worker response:', data)
-      setTestResult(JSON.stringify(data, null, 2))
-    } catch (error) {
-      console.error('Error calling Worker:', error)
-      setTestResult(`Error: ${String(error)}`)
-    }
-  }
+  // const testWorker = async () => {
+  //   try {
+  //     console.log('Calling Worker API...')
+  //     const response = await fetch('/api/test')
+  //     console.log(response)
+  //     const data = await response.json()
+  //     console.log('Worker response:', data)
+  //     setTestResult(JSON.stringify(data, null, 2))
+  //   } catch (error) {
+  //     console.error('Error calling Worker:', error)
+  //     setTestResult(`Error: ${String(error)}`)
+  //   }
+  // }
 
   const handleUpload = async () => {
     if (!selectedFiles || selectedFiles.length === 0) {
@@ -108,9 +108,10 @@ function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'white', padding: '20px' }}>
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <h1>Log File Upload</h1>
+    <div style={{ height: '100vh', width: '100%', backgroundColor: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <div style={{ width: '100%', maxWidth: '800px' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem', textAlign: 'center' }}>AI Cache Optimizer</h1>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 'normal', color: '#6b7280', marginTop: 0, marginBottom: '2rem', textAlign: 'center' }}>Log File Upload</h2>
 
       <div style={{ marginTop: '20px' }}>
         <input
@@ -122,82 +123,58 @@ function App() {
           style={{ display: 'none' }}
         />
 
-        <button
-          onClick={handleUploadClick}
-          style={{
-            padding: '12px 24px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            marginRight: '10px'
-          }}
-        >
-          Select Log Files
-        </button>
+        {/* Main buttons */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
+          <button
+            onClick={handleUploadClick}
+            style={{
+              padding: '12px 24px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px'
+            }}
+          >
+            Select Log Files
+          </button>
 
-        <button
-          onClick={testButton}
-          style={{
-            padding: '12px 24px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            marginRight: '10px'
-          }}
-        >
-          Test Worker API
-        </button>
+          <button
+            onClick={() => navigate('/chat')}
+            style={{
+              padding: '12px 24px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              backgroundColor: '#17a2b8',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px'
+            }}
+          >
+            Open AI Chat
+          </button>
+        </div>
 
-        <button
-          onClick={() => navigate('/chat')}
-          style={{
-            padding: '12px 24px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            backgroundColor: '#17a2b8',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px'
-          }}
-        >
-          Open AI Chat
-        </button>
-
-        {testResult && (
-          <div style={{
-            marginTop: '20px',
-            padding: '15px',
-            backgroundColor: '#000000ff',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px'
-          }}>
-            <h3>Worker Response:</h3>
-            <pre style={{ margin: 0, fontSize: '14px' }}>{testResult}</pre>
-          </div>
-        )}
-
+        {/* Upload button appears below when files are selected */}
         {selectedFiles && selectedFiles.length > 0 && (
           <>
-            <button
-              onClick={handleUpload}
-              style={{
-                padding: '12px 24px',
-                fontSize: '16px',
-                cursor: 'pointer',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px'
-              }}
-            >
-              Upload {selectedFiles.length} File(s)
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+              <button
+                onClick={handleUpload}
+                style={{
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px'
+                }}
+              >
+                Upload {selectedFiles.length} File(s)
+              </button>
+            </div>
 
             <div style={{ marginTop: '20px' }}>
               <h3>Selected Files:</h3>
