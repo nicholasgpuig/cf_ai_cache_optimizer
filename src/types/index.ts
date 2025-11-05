@@ -36,24 +36,23 @@ export type EndpointMetric = {
 	CacheBypasses: number;
 	OriginResponseTimes: Statistics;
 	ByteAmounts: Statistics;
-	WAFActions: Map<WAFAction, number>;
+	WAFActions: Record<string, number>;
 	BotScores: Statistics;
 	ThreatScores: Statistics;
-	TopASNs: Map<number, number>;
-	OriginIPDistribution: Map<string, {
+	TopASNs: Record<number, number>;
+	OriginIPDistribution: Record<string, {
 		requests: number;
 		avgResponseMs: number;
 		clientErrorRate: number;  // 4xx errors / total requests to this IP
 		serverErrorRate: number; // 5xx errors / total
 	}>;
-	QueryParamImpact: Map<string, {  // Query param → cache performance
+	QueryParamImpact: Record<string, {  // Query param → cache performance
 		requests: number;
 		cacheHitRate: number;
 		avgResponseMs: number;
 	}>;
-	StatusCodeDistribution: Map<number, number>;  // Helps detect error patterns
-	MethodDistribution: Map<HTTPMethod, number>;
-
+	StatusCodeDistribution: Record<number, number>;  // Helps detect error patterns
+	MethodDistribution: Record<string, number>;
 }
 
 export type Statistics = {

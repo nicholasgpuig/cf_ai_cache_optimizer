@@ -121,7 +121,7 @@ function App() {
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".log,.txt,.json"
+          accept=".json"
           onChange={handleFileSelect}
           style={{ display: 'none' }}
         />
@@ -161,7 +161,7 @@ function App() {
           <div style={{
             marginTop: '20px',
             padding: '15px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: '#000000ff',
             border: '1px solid #dee2e6',
             borderRadius: '4px'
           }}>
@@ -199,6 +199,7 @@ function App() {
             </div>
           </>
         )}
+
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { HandlerFunction, AnalyzeRequest, AnalyzeResponse, EndpointMetric, WAFAction, HTTPMethod } from '../types';
+import { HandlerFunction, AnalyzeRequest } from '../types';
 import { successResponse, errorResponse } from '../utils/response';
 import { calculateStatistics } from '../utils/statistics';
 
@@ -6,7 +6,11 @@ import { calculateStatistics } from '../utils/statistics';
  * Analyze endpoint handler
  * Receives log data and performs analysis
  */
-const TOP_K_ASN = 10
+const TOP_K_ASN = 10;
+const MIN_REQUESTS_THRESHOLD = 5;
+const TOP_K_QUERY_PARAMS = 10;
+const TOP_K_ORIGIN_IPS = 5;
+
 export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 	try {
 		// Parse request body
@@ -16,7 +20,7 @@ export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 		console.log(`Analyzing ${metadata.totalEntries} log entries from ${metadata.fileCount} files`);
 
 		// Aggregate data structure - collect raw data during iteration
-		const aggregate = new Map<string, {
+		const aggregate: Record<string, {
 			requests: number;
 			cacheHits: number;
 			cacheMisses: number;
@@ -25,29 +29,29 @@ export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 			cacheStale: number;
 			bytes: number[];
 			originMs: number[];
-			wafActions: Map<WAFAction, number>;
+			wafActions: Record<string, number>;
 			botScores: number[];
 			threatScores: number[];
-			asnCounts: Map<number, number>;
-			originIPs: Map<string, {
+			asnCounts: Record<number, number>;
+			originIPs: Record<string, {
 				requests: number;
 				responseTimes: number[];
 				clientErrors: number; // 4xx
 				serverErrors: number; // 5xx
 			}>;
-			queryParams: Map<string, {
+			queryParams: Record<string, {
 				requests: number;
 				cacheHits: number;
 				responseTimes: number[];
 			}>;
-			statusCodes: Map<number, number>;
-			methods: Map<HTTPMethod, number>;
-		}>();
+			statusCodes: Record<number, number>;
+			methods: Record<string, number>;
+		}> = {};
 
 		// STEP 1: Iterate through logs and collect data
 		for (const entry of logs) {
 			const url = entry.URL;
-			const existing = aggregate.get(url) ?? {
+			const existing = aggregate[url] ?? {
 				requests: 0,
 				cacheHits: 0,
 				cacheMisses: 0,
@@ -56,23 +60,14 @@ export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 				cacheStale: 0,
 				bytes: [],
 				originMs: [],
-				wafActions: new Map<WAFAction, number>(),
+				wafActions: {},
 				botScores: [],
 				threatScores: [],
-				asnCounts: new Map<number, number>(),
-				originIPs: new Map<string, {
-					requests: number;
-					responseTimes: number[];
-					clientErrors: number;
-					serverErrors: number;
-				}>(),
-				queryParams: new Map<string, {
-					requests: number;
-					cacheHits: number;
-					responseTimes: number[];
-				}>(),
-				statusCodes: new Map<number, number>(),
-				methods: new Map<HTTPMethod, number>()
+				asnCounts: {},
+				originIPs: {},
+				queryParams: {},
+				statusCodes: {},
+				methods: {}
 			};
 
 			// Increment request count
@@ -90,20 +85,18 @@ export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 			existing.originMs.push(entry.OriginResponseDurationMs);
 
 			// Track WAF actions
-			const wafCount = existing.wafActions.get(entry.WAFAction) ?? 0;
-			existing.wafActions.set(entry.WAFAction, wafCount + 1);
+			existing.wafActions[entry.WAFAction] = (existing.wafActions[entry.WAFAction] ?? 0) + 1;
 
 			// Collect bot and threat scores
 			existing.botScores.push(entry.BotScore);
 			existing.threatScores.push(entry.ThreatScore);
 
 			// Track ASN distribution
-			const asnCount = existing.asnCounts.get(entry.ASN) ?? 0;
-			existing.asnCounts.set(entry.ASN, asnCount + 1);
+			existing.asnCounts[entry.ASN] = (existing.asnCounts[entry.ASN] ?? 0) + 1;
 
 			// Track origin IP distribution
 			if (entry.OriginIP) {
-				const ipData = existing.originIPs.get(entry.OriginIP) ?? {
+				const ipData = existing.originIPs[entry.OriginIP] ?? {
 					requests: 0,
 					responseTimes: [],
 					clientErrors: 0,
@@ -117,12 +110,12 @@ export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 				if (entry.EdgeResponseStatus >= 500) {
 					ipData.serverErrors += 1;
 				}
-				existing.originIPs.set(entry.OriginIP, ipData);
+				existing.originIPs[entry.OriginIP] = ipData;
 			}
 
 			// Track query parameter impact
 			const queryParam = entry.ClientRequestQuery || '(none)';
-			const queryData = existing.queryParams.get(queryParam) ?? {
+			const queryData = existing.queryParams[queryParam] ?? {
 				requests: 0,
 				cacheHits: 0,
 				responseTimes: []
@@ -130,70 +123,78 @@ export const handleAnalyze: HandlerFunction = async (request, env, ctx) => {
 			queryData.requests += 1;
 			if (entry.CacheStatus === 'HIT') queryData.cacheHits += 1;
 			queryData.responseTimes.push(entry.ResponseTimeMs);
-			existing.queryParams.set(queryParam, queryData);
+			existing.queryParams[queryParam] = queryData;
 
 			// Track status codes
-			const statusCount = existing.statusCodes.get(entry.EdgeResponseStatus) ?? 0;
-			existing.statusCodes.set(entry.EdgeResponseStatus, statusCount + 1);
+			existing.statusCodes[entry.EdgeResponseStatus] = (existing.statusCodes[entry.EdgeResponseStatus] ?? 0) + 1;
 
 			// Track HTTP methods
-			const methodCount = existing.methods.get(entry.Method) ?? 0;
-			existing.methods.set(entry.Method, methodCount + 1);
+			existing.methods[entry.Method] = (existing.methods[entry.Method] ?? 0) + 1;
 
-			aggregate.set(url, existing);
+			aggregate[url] = existing;
 		}
 
 		// STEP 2: Calculate aggregate statistics for each endpoint
-		const endpointMetrics: EndpointMetric[] = Array.from(aggregate.entries()).map(([url, data]) => {
+		const endpointMetrics = Object.entries(aggregate).map(([url, data]) => {
 			// Calculate origin IP distribution metrics
-			const originIPDistribution = new Map<string, {
+			const originIPDistribution: Record<string, {
 				requests: number;
 				avgResponseMs: number;
 				clientErrorRate: number;
 				serverErrorRate: number;
-			}>();
+			}> = {};
 
-			for (const [ip, ipData] of data.originIPs.entries()) {
-				const avgResponseMs = ipData.responseTimes.length > 0
-					? ipData.responseTimes.reduce((a, b) => a + b, 0) / ipData.responseTimes.length
-					: 0;
-				const clientErrorRate = ipData.requests > 0 ? ipData.clientErrors / ipData.requests : 0;
-				const serverErrorRate = ipData.requests > 0 ? ipData.serverErrors / ipData.requests : 0;
+			Object.entries(data.originIPs)
+				.filter(([_, ipData]) => ipData.requests >= MIN_REQUESTS_THRESHOLD)
+				.sort((a, b) => b[1].requests - a[1].requests)
+				.slice(0, TOP_K_ORIGIN_IPS)
+				.forEach(([ip, ipData]) => {
+					const avgResponseMs = ipData.responseTimes.length > 0
+						? ipData.responseTimes.reduce((a, b) => a + b, 0) / ipData.responseTimes.length
+						: 0;
+					const clientErrorRate = ipData.requests > 0 ? ipData.clientErrors / ipData.requests : 0;
+					const serverErrorRate = ipData.requests > 0 ? ipData.serverErrors / ipData.requests : 0;
 
-				originIPDistribution.set(ip, {
-					requests: ipData.requests,
-					avgResponseMs,
-					clientErrorRate,
-					serverErrorRate
+					originIPDistribution[ip] = {
+						requests: ipData.requests,
+						avgResponseMs,
+						clientErrorRate,
+						serverErrorRate
+					};
 				});
-			}
 
 			// Calculate query parameter impact metrics
-			const queryParamImpact = new Map<string, {
+			const queryParamImpact: Record<string, {
 				requests: number;
 				cacheHitRate: number;
 				avgResponseMs: number;
-			}>();
+			}> = {};
 
-			for (const [param, paramData] of data.queryParams.entries()) {
-				const cacheHitRate = paramData.requests > 0 ? paramData.cacheHits / paramData.requests : 0;
-				const avgResponseMs = paramData.responseTimes.length > 0
-					? paramData.responseTimes.reduce((a, b) => a + b, 0) / paramData.responseTimes.length
-					: 0;
+			Object.entries(data.queryParams)
+				.filter(([_, paramData]) => paramData.requests >= MIN_REQUESTS_THRESHOLD)
+				.sort((a, b) => b[1].requests - a[1].requests)
+				.slice(0, TOP_K_QUERY_PARAMS)
+				.forEach(([param, paramData]) => {
+					const cacheHitRate = paramData.requests > 0 ? paramData.cacheHits / paramData.requests : 0;
+					const avgResponseMs = paramData.responseTimes.length > 0
+						? paramData.responseTimes.reduce((a, b) => a + b, 0) / paramData.responseTimes.length
+						: 0;
 
-				queryParamImpact.set(param, {
-					requests: paramData.requests,
-					cacheHitRate,
-					avgResponseMs
+					queryParamImpact[param] = {
+						requests: paramData.requests,
+						cacheHitRate,
+						avgResponseMs
+					};
 				});
-			}
 
 			// Sort ASNs by request count and take top TOP_K_ASN
-			const topASNs = new Map<number, number>(
-				Array.from(data.asnCounts.entries())
-					.sort((a, b) => b[1] - a[1])
-					.slice(0, TOP_K_ASN)
-			);
+			const topASNs: Record<number, number> = {};
+			Object.entries(data.asnCounts)
+				.sort((a, b) => b[1] - a[1])
+				.slice(0, TOP_K_ASN)
+				.forEach(([asn, count]) => {
+					topASNs[Number(asn)] = count;
+				});
 
 			return {
 				EndpointURL: url,
