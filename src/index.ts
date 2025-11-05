@@ -56,6 +56,48 @@ export default {
 			});
 		}
 
+		// Analyze endpoint
+		if (url.pathname === '/api/analyze' && request.method === 'POST') {
+			try {
+				const body = await request.json() as {
+					logs: unknown[];
+					metadata: {
+						fileCount: number;
+						totalEntries: number;
+						timestamp: string;
+					};
+				};
+				const { logs, metadata } = body;
+
+				console.log(`Analyzing ${metadata.totalEntries} log entries from ${metadata.fileCount} files`);
+
+				// Perform analysis on the logs
+				const analysis = {
+					totalEntries: logs.length,
+					fileCount: metadata.fileCount,
+					timestamp: metadata.timestamp,
+					summary: {
+						// Add your analysis logic here
+						processed: true,
+						message: `Successfully analyzed ${logs.length} log entries`
+					}
+				};
+
+				return new Response(JSON.stringify(analysis), {
+					headers: { 'Content-Type': 'application/json' }
+				});
+			} catch (error) {
+				console.error('Analysis error:', error);
+				return new Response(JSON.stringify({
+					error: 'Analysis failed',
+					message: String(error)
+				}), {
+					status: 500,
+					headers: { 'Content-Type': 'application/json' }
+				});
+			}
+		}
+
 		// Original Durable Object example
 		const stub = env.MY_DURABLE_OBJECT.getByName("foo");
 		const greeting = await stub.sayHello("world");

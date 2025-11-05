@@ -37,13 +37,78 @@ function App() {
       return
     }
 
-    // TODO: Implement actual upload logic
-    console.log(`Uploading ${selectedFiles.length} file(s)`)
+    try {
+      console.log(`Processing ${selectedFiles.length} file(s)...`)
 
-    // Example: Process files
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i]
-      console.log(`File ${i + 1}: ${file.name} (${file.size} bytes)`)
+      // Compile all JSON files into one array
+      const compiledData: unknown[] = []
+      const errors: string[] = []
+
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i]
+        console.log(`Reading file ${i + 1}/${selectedFiles.length}: ${file.name}`)
+
+        try {
+          const fileText = await file.text()
+          const jsonData = JSON.parse(fileText)
+
+          // If jsonData is an array, spread it; otherwise add as single item
+          if (Array.isArray(jsonData)) {
+            compiledData.push(...jsonData)
+          } else {
+            compiledData.push(jsonData)
+          }
+
+          console.log(`✓ Successfully parsed ${file.name}`)
+        } catch (error) {
+          const errorMsg = `Failed to parse ${file.name}: ${error}`
+          console.error(errorMsg)
+          errors.push(errorMsg)
+        }
+      }
+
+      if (compiledData.length === 0) {
+        alert('No valid JSON data found in the selected files')
+        return
+      }
+
+      console.log(`Compiled ${compiledData.length} log entries from ${selectedFiles.length} files`)
+
+      // Send compiled data to Worker for analysis
+      console.log('Sending data to Worker for analysis...')
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          logs: compiledData,
+          metadata: {
+            fileCount: selectedFiles.length,
+            totalEntries: compiledData.length,
+            timestamp: new Date().toISOString()
+          }
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Worker request failed: ${response.status} ${response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('Analysis result:', result)
+
+      // Show success message
+      let message = `Successfully analyzed ${compiledData.length} log entries from ${selectedFiles.length} file(s)`
+      if (errors.length > 0) {
+        message += `\n\nWarnings:\n${errors.join('\n')}`
+      }
+      alert(message)
+
+      // Optionally display results
+      setTestResult(JSON.stringify(result, null, 2))
+
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert(`Error: ${String(error)}`)
     }
   }
 
@@ -56,7 +121,7 @@ function App() {
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".log,.txt"
+          accept=".log,.txt,.json"
           onChange={handleFileSelect}
           style={{ display: 'none' }}
         />

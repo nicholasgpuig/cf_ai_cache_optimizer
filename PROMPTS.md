@@ -3,3 +3,6 @@ I want to create an edge-hosted AI assistant that ingests Cloudflare access logs
 In App.tsx, create a simple file upload interface, including a single button UI element to upload the log files in batch.
 
 List the steps to create a binding for my Workers that will make them accessible to my Pages app in the same repository. Create code snippets in Typescript, too.
+
+
+How does the onRequest function work? Does it trigger on every outbound request the pages makes? I want to have different pages call different workers with different paths
