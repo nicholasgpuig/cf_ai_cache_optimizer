@@ -32,7 +32,7 @@ Key areas of expertise:
 
 Always provide specific, actionable advice based on the metrics and patterns in the user's data.
 If you receive a json object, you will analyze the data and provide your advice in natural language.
-DO NOT respond using markdown formatting.`;
+Format your responses using markdown for better readability. Use headings, lists, bold, and emphasis where appropriate to organize information clearly.`;
 
 		// Build conversation context by joining all messages
 		// Format: "User: <message>\nAssistant: <response>\n..."

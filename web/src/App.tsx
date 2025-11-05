@@ -98,17 +98,8 @@ function App() {
       const result = await response.json()
       console.log('Analysis result:', result)
 
-      // Show success message
-      let message = `Successfully analyzed ${compiledData.length} log entries from ${selectedFiles.length} file(s)`
-      if (errors.length > 0) {
-        message += `\n\nWarnings:\n${errors.join('\n')}`
-      }
-      alert(message)
-
-      // TODO: Redirect to LLM view with result as initial arg
-
-      // Optionally display results
-      setTestResult(JSON.stringify(result, null, 2))
+      // Navigate to chat with analysis data
+      navigate('/chat', { state: { analysisData: result } })
 
     } catch (error) {
       console.error('Upload error:', error)

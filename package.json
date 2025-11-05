@@ -12,5 +12,8 @@
 		"@types/node": "^24.10.0",
 		"typescript": "^5.5.2",
 		"wrangler": "^4.45.3"
+	},
+	"dependencies": {
+		"remark-gfm": "^4.0.1"
 	}
 }
