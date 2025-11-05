@@ -1,18 +1,14 @@
 import { DurableObject } from "cloudflare:workers";
+import { handleTest } from './handlers/test';
+import { handleAnalyze } from './handlers/analyze';
+import { errorResponse } from './utils/response';
 
 /**
- * Welcome to Cloudflare Workers! This is your first Durable Objects application.
+ * Cloudflare AI Cache Optimizer Worker
  *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your Durable Object in action
- * - Run `npm run deploy` to publish your application
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/durable-objects
+ * This Worker provides API endpoints for log analysis and caching optimization.
+ * It uses a router pattern to delegate requests to specific handlers.
  */
-
 
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class MyDurableObject extends DurableObject {
@@ -32,9 +28,18 @@ export class MyDurableObject extends DurableObject {
 	}
 }
 
+/**
+ * Route map for API endpoints
+ * Maps pathname patterns to their handler functions
+ */
+const routes: Record<string, (request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>> = {
+	'/api/test': handleTest,
+	'/api/analyze': handleAnalyze,
+};
+
 export default {
 	/**
-	 * This is the standard fetch handler for a Cloudflare Worker
+	 * Main fetch handler - routes requests to appropriate handlers
 	 *
 	 * @param request - The request submitted to the Worker from the client
 	 * @param env - The interface to reference bindings declared in wrangler.jsonc
@@ -43,64 +48,22 @@ export default {
 	 */
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
+		const path = url.pathname;
 
-		// Test endpoint
-		if (url.pathname === '/api/test') {
-			console.log('Test endpoint called from Pages!');
-			return new Response(JSON.stringify({
-				message: 'Hello from Worker!',
-				timestamp: new Date().toISOString(),
-				success: true
-			}), {
-				headers: { 'Content-Type': 'application/json' }
-			});
+		// Check if we have a handler for this route
+		const handler = routes[path];
+		if (handler) {
+			return handler(request, env, ctx);
 		}
 
-		// Analyze endpoint
-		if (url.pathname === '/api/analyze' && request.method === 'POST') {
-			try {
-				const body = await request.json() as {
-					logs: unknown[];
-					metadata: {
-						fileCount: number;
-						totalEntries: number;
-						timestamp: string;
-					};
-				};
-				const { logs, metadata } = body;
-
-				console.log(`Analyzing ${metadata.totalEntries} log entries from ${metadata.fileCount} files`);
-
-				// Perform analysis on the logs
-				const analysis = {
-					totalEntries: logs.length,
-					fileCount: metadata.fileCount,
-					timestamp: metadata.timestamp,
-					summary: {
-						// Add your analysis logic here
-						processed: true,
-						message: `Successfully analyzed ${logs.length} log entries`
-					}
-				};
-
-				return new Response(JSON.stringify(analysis), {
-					headers: { 'Content-Type': 'application/json' }
-				});
-			} catch (error) {
-				console.error('Analysis error:', error);
-				return new Response(JSON.stringify({
-					error: 'Analysis failed',
-					message: String(error)
-				}), {
-					status: 500,
-					headers: { 'Content-Type': 'application/json' }
-				});
-			}
+		// Fallback: Durable Object example
+		if (path === '/') {
+			const stub = env.MY_DURABLE_OBJECT.getByName("foo");
+			const greeting = await stub.sayHello("world");
+			return new Response(greeting);
 		}
 
-		// Original Durable Object example
-		const stub = env.MY_DURABLE_OBJECT.getByName("foo");
-		const greeting = await stub.sayHello("world");
-		return new Response(greeting);
+		// Route not found
+		return errorResponse(`Route not found: ${path}`, 404);
 	},
 } satisfies ExportedHandler<Env>;

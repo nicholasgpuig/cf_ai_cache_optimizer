@@ -6,3 +6,7 @@ List the steps to create a binding for my Workers that will make them accessible
 
 
 How does the onRequest function work? Does it trigger on every outbound request the pages makes? I want to have different pages call different workers with different paths
+
+In the workers wrangler config, why do we need an entrypoint for the main parameter? In our case where each worker will be called by the pages, will it work to keep main as a random one since we'll never call the worker directly?
+
+Should we create separate worker files for each endpoint that the index.ts can route to? How would we structure that? Don't write code.
