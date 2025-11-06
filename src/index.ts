@@ -1,4 +1,3 @@
-import { DurableObject } from "cloudflare:workers";
 import { handleTest } from './handlers/test';
 import { handleAnalyze } from './handlers/analyze';
 import { handleChat } from './handlers/chat';
@@ -10,24 +9,6 @@ import { errorResponse } from './utils/response';
  * This Worker provides API endpoints for log analysis and caching optimization.
  * It uses a router pattern to delegate requests to specific handlers.
  */
-
-/** A Durable Object's behavior is defined in an exported Javascript class */
-export class MyDurableObject extends DurableObject {
-	/**
-	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
-	 * 	`DurableObjectStub::get` for a given identifier (no-op constructors can be omitted)
-	 *
-	 * @param ctx - The interface for interacting with Durable Object state
-	 * @param env - The interface to reference bindings declared in wrangler.jsonc
-	 */
-	constructor(ctx: DurableObjectState, env: Env) {
-		super(ctx, env);
-	}
-
-	async sayHello(name: string): Promise<string> {
-		return `Hello, ${name}!`;
-	}
-}
 
 /**
  * Route map for API endpoints
