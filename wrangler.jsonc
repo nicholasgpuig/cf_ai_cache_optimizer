@@ -3,20 +3,9 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2024-09-23",
 	"durable_objects": {
-		"bindings": [
-			{
-				"name": "MY_DURABLE_OBJECT",
-				"class_name": "MyDurableObject",
-				"script_name": "cf-ai-cache-optimizer"
-			}
-		]
+		"bindings": [],
 	},
-	"migrations": [
-		{
-			"tag": "v1",
-			"new_sqlite_classes": ["MyDurableObject"]
-		}
-	],
+	"migrations": [],
 	"observability": {
 		"enabled": true
 	},
