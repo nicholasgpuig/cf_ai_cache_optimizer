@@ -54,3 +54,7 @@ Test the complete chat flow by navigating to /chat, sending a message, and verif
 Make two UI changes:
 First, include a back arrow in the chat ui to take you back to the file upload screen, restarting the process.
 Second, for both the chat and upload views, make the white cover the entire screen space no matter the size of the other elements; right now the white section only covers about the size of a phone.
+
+Write a concise plan for creating jest tests for this repo. Including unit tests and maybe integration tests between the web and workers portions of this code.
+
+In the web portion, I want to create a feature where users can download our example logs straight from the cloudflare page in case they don't have a local repository copy. Create three buttons on the main page that allow users to download the cache miss, ddos attack, and normal traffic json files.

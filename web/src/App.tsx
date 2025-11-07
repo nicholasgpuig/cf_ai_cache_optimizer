@@ -19,6 +19,13 @@ function App() {
     fileInputRef.current?.click()
   }
 
+  const handleDownloadExample = (filename: string) => {
+    const link = document.createElement('a')
+    link.href = `/examples/${filename}`
+    link.download = filename
+    link.click()
+  }
+
   // const testWorker = async () => {
   //   try {
   //     console.log('Calling Worker API...')
@@ -154,6 +161,68 @@ function App() {
           >
             Open AI Chat
           </button>
+        </div>
+
+        {/* Example download buttons */}
+        <div style={{ marginTop: '30px', marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '1rem', color: '#6b7280', textAlign: 'center', marginBottom: '15px' }}>
+            Download Example Logs
+          </h3>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => handleDownloadExample('cache_miss_query.json')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+            >
+              Cache Miss Logs
+            </button>
+
+            <button
+              onClick={() => handleDownloadExample('ddos_attack.json')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+            >
+              DDoS Attack Logs
+            </button>
+
+            <button
+              onClick={() => handleDownloadExample('normal_traffic.json')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+            >
+              Normal Traffic Logs
+            </button>
+          </div>
         </div>
 
         {/* Upload button appears below when files are selected */}
