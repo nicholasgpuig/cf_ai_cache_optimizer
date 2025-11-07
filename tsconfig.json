@@ -39,6 +39,7 @@
 		"types": [
 			"./worker-configuration.d.ts",
 			"node",
+			"jest"
 		]
 	}
 }
