@@ -58,3 +58,7 @@ Second, for both the chat and upload views, make the white cover the entire scre
 Write a concise plan for creating jest tests for this repo. Including unit tests and maybe integration tests between the web and workers portions of this code.
 
 In the web portion, I want to create a feature where users can download our example logs straight from the cloudflare page in case they don't have a local repository copy. Create three buttons on the main page that allow users to download the cache miss, ddos attack, and normal traffic json files.
+
+Consider the entire project so far; this is nearly its final form. We need to update the README for Cloudflare's recruiting/engineering team to read. They will need to test it, possibly locally or a deployed version of my app, thus I need to make instructions/explanations as clear as possible.
+
+First, examine the How it works section, and suggest improvements
