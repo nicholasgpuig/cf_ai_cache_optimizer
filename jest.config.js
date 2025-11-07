@@ -14,13 +14,13 @@ module.exports = {
 	coverageDirectory: 'coverage',
 	coverageReporters: ['text', 'lcov', 'html'],
 	verbose: true,
-	globals: {
-		'ts-jest': {
+	transform: {
+		'^.+\\.tsx?$': ['ts-jest', {
 			tsconfig: {
 				target: 'es2021',
 				module: 'commonjs',
 				esModuleInterop: true
 			}
-		}
+		}]
 	}
 };
