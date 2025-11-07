@@ -25,7 +25,7 @@ Currently deployed live here: https://wandering-brook-d1cc.pages.dev
 
 - **Node.js** 18+ (tested with 20.15.1)
 - **npm** 10+
-- **Cloudflare Account** with Workers AI enabled
+- **Cloudflare Account**
   - [Sign up for Cloudflare](https://dash.cloudflare.com/sign-up)
 - **Wrangler CLI** for deployment
   - Install: `npm install -g wrangler`
@@ -37,7 +37,7 @@ This is a monorepo with separate dependencies for the Worker backend and Pages f
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/nicholasgpuig/cf_ai_cache_optimizer.git
 cd cf_ai_cache_optimizer
 
 # Install Worker dependencies
