@@ -169,3 +169,6 @@ dist
 .DS_Store
 
 .claude
+
+.editorconfig
+.prettierrc
