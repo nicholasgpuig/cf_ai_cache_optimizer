@@ -2,6 +2,8 @@
 
 A Cloudflare Workers and Pages application for AI analysis of Cloudflare HTTP logs.
 
+![Chat Interface](images/chat_interface.png)
+
 Currently deployed live here: https://wandering-brook-d1cc.pages.dev
 
 ### How It Works
@@ -36,7 +38,7 @@ This is a monorepo with separate dependencies for the Worker backend and Pages f
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd cf-ai-cache-optimizer
+cd cf_ai_cache_optimizer
 
 # Install Worker dependencies
 cd workers
@@ -55,14 +57,15 @@ Run both Worker and Pages locally for faster iteration.
 
 1. **Terminal 1 - Run Worker locally:**
    ```bash
-   wrangler dev --port 8787
+   cd workers
+   npx wrangler dev --port 8787
    ```
 
 2. **Terminal 2 - Run Pages with local Worker binding:**
    ```bash
-   cd web
+   cd ../web
    npm run build
-   wrangler pages dev dist --service WORKER_API=cf-ai-cache-optimizer@local --port 8789
+   npx wrangler pages dev dist --service WORKER_API=cf-ai-cache-optimizer --port 8789
    ```
 
 3. **Open your browser:**
@@ -74,7 +77,8 @@ Run both Worker and Pages locally for faster iteration.
 ### Deploy Worker
 
 ```bash
-wrangler deploy
+cd workers
+npx wrangler deploy
 ```
 
 The Worker will be deployed to: `https://cf-ai-cache-optimizer.<your-subdomain>.workers.dev`
@@ -82,7 +86,7 @@ The Worker will be deployed to: `https://cf-ai-cache-optimizer.<your-subdomain>.
 ### Deploy Pages
 
 ```bash
-cd web
+cd ../web
 npm run deploy
 ```
 
